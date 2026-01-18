@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Home Page{% endblock %}
+{% block header1 %}Home{% endblock %}
+{% block content %}
+    <div>
+        <img src="{{ url_for('static', filename='image1.jpg') }}" class="img-fluid" alt="Office Work" width="400" height="266">
+        <p class="smartclean text-info">SmartClean</p>
+        <p class="fs-2 text-end">Accelerate Your Data Cleaning</p>    
+    </div>
+{% endblock %}
+

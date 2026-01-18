@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Contact Page{% endblock %}
+{% block header1 %}Contact{% endblock %}
+{% block content %}
+    <div class="d-flex flex-row mb-3">
+      <div class="p-5">
+             <div class="card">
+              <div class="card-body">
+                  <img src="{{ url_for('static', filename='olga.jpeg') }}" class="img-fluid" alt="Olga Durham" width="150" height="150">
+              </div>
+            </div>
+      </div>
+      <div class="p-5">
+             <div class="card">
+              <div class="card-body">
+                  <h3 class="text-info">SmartClean developer Contacts:</h3>
+                  <p><span class="fw-bold">Email:</span> {{ email }}</p>
+                  <p><span class="fw-bold">Cell:</span> {{ tel }}</p>
+              </div>
+            </div>
+      </div>      
+    </div>
+    <p class="fs-2 text-end">Accelerate Your Data Cleaning</p>
+{% endblock %}

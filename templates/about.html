@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}About Page{% endblock %}
+{% block header1 %}About{% endblock %}
+{% block content %}
+    <div class="d-flex flex-row mb-3">
+      <div class="p-5"><img src="{{ url_for('static', filename='image2.jpg') }}" class="img-fluid" alt="Data" width="800" height="534"></div>
+      <div class="p-5">
+          <h4 class="text-info">SmartClean: Efficient Dataset Cleaning Made Easy</h4>
+          <p>SmartClean 1.0.0 is a powerful web application designed to streamline and accelerate dataset cleaning. It supports the following types of datasets:</p>
+          <ol>
+              <li>Datasets containing only numerical values.</li>
+              <li>Datasets with both numerical and categorical variables.</li>
+              <li>Datasets that include numerical, categorical, and date columns.</li>
+          </ol>
+          <p>With SmartClean, users can effortlessly upload a dataset, apply cleaning processes, and download a refined version—ensuring cleaner, more reliable data in just a few clicks.</p>
+      </div>
+      
+    </div>
+    <p class="fs-2 text-end">Accelerate Your Data Cleaning</p>
+{% endblock %}
