@@ -1,280 +1,263 @@
-{% extends "base.html" %}
-{% block title %}Clean Page{% endblock %}
-{% block header1 %}Clean{% endblock %}
-{% block content %}
-    <form action="/clean" method="post" enctype="multipart/form-data">
-      <div class="mb-3">
-        <label for="file" class="form-label">Upload your dataset:</label>
-        <input type="file" name="file" required class="form-control" id="inputFile">
-      </div>
-      <button type="submit" class="btn btn-primary">Upload</button>
-    </form>
+{% extends "base.html" %} {% block title %}Clean Page{% endblock %} {% block
+header1 %}Clean{% endblock %} {% block content %}
 
-    {% if alert %}
-        <hr>
-        <div class="alert alert-success" role="alert">
-          {{ alert }}
-        </div>
-      
-        {% if df_info %}
-            <div class="card">
-              <div class="card-body">
-                  <h3>Dataset Info</h3>
-                  <pre>
-                      {% for line in df_info %}
-                        {{ line }}
-                      {% endfor %}
-                  </pre>
-              </div>
-            </div>
-        {% endif %}
-    
-        {% if df_duplicates %}
-            <div class="card">
-              <div class="card-body">
-                  <h3>Duplicate Rows</h3>
-                  <pre>
-                    {{ df_duplicates }}
-                  </pre>
-              </div>
-            </div>
-        {% endif %}
-    
-        {% if df_describe %}
-            <div class="card">
-              <div class="card-body">
-                  <h3>Summary Statistics</h3>
-                  <pre>
-                    {{ df_describe | safe }}
-                  </pre>
-              </div>
-            </div>
-        {% endif %}
-    
-        {% if df_duplicates_deleted  %}
-            <div class="card">
-              <div class="card-body">
-                  <h3>Deleting Detaset Duplicates</h3>
-                  <pre>
-                    {{ df_duplicates_deleted }}
-                  </pre>
-              </div>
-            </div>
-        {% endif %}
- 
-        {% if df_head %}
-            <div class="card">
-              <div class="card-body">
-                  <h3>First Five Rows of Dataset</h3>
-                  <pre>
-                    {{ df_head | safe }}
-                  </pre>
-              </div>
-            </div>
-        {% endif %}
+<!-- ===================== -->
+<!-- 1) Upload CSV -->
+<!-- ===================== -->
+<form action="/clean" method="post" enctype="multipart/form-data">
+  <div class="mb-3">
+    <label for="inputFile" class="form-label">Upload your dataset:</label>
+    <input
+      type="file"
+      name="file"
+      required
+      class="form-control"
+      id="inputFile"
+      accept=".csv"
+    />
+  </div>
+  <button type="submit" class="btn btn-primary">Upload</button>
+</form>
 
-        {% if df_duplicates_deleted %}
-          <form action="/clean_numeric_columns" method="post" enctype="multipart/form-data">
-              <div class="mb-3">
-                <label for="numeric_cols" class="form-label">Please, enter the names of the numeric columns (comma-separated), e.g.:  quantity, price per unit, total spent etc.(Ensure they exists in the dataset):</label>
-                <input type="text" name="numeric_cols" required class="form-control" id="numeric_cols">
-              </div>
-              <button type="submit" class="btn btn-primary">Submit</button>
-          </form>
-        {% endif %}
-      
-        {% if df_describe_4 %}
-            <div class="card">
-              <div class="card-body">
-                  <h3>Summary Statistics</h3>
-                  <pre>
-                    {{ df_describe_4 | safe }}
-                  </pre>
-              </div>
-            </div>
-        {% endif %}
-    
-        {% if missings_percentage %}
-            <div class="card">
-              <div class="card-body">
-                  <h3>Percentage of Missing Values</h3>
-                  <pre>
-                      {% for column, percentage in missings_percentage.items() %}
-                        {{ column }}: {{ percentage | round(2) }}%
-                      {% endfor %}
-                  </pre>
-              </div>
-            </div>
-        {% endif %}
-    
-        {% if columns_less_5_perc_missing %}
-            <div class="card">
-              <div class="card-body">
-                  <h3>Columns with less than 5% of Missing Values</h3>
-                  <pre>
-                      {% for c in columns_less_5_perc_missing %}
-                         {{ c }}
-                      {% endfor %}
-                  </pre>
-              </div>
-            </div>
-        <h4 class="text-info">Records with missing values where columns have less than 5% missing values have been dropped</h4>
-        {% endif %}
-    
-        {% if missings_percentage_after %}
-            <div class="card">
-              <div class="card-body">
-                  <h3>Percentage of Missing Values left</h3>
-                  <pre>
-                      {% for column, percentage in missings_percentage_after.items() %}
-                        {{ column }}: {{ percentage | round(2) }}%
-                      {% endfor %}
-                  </pre>
-              </div>
-            </div>
-        {% endif %}
-    
-        {% if fill_cat_mis_val %}
-            <div class="card">
-              <div class="card-body">
-                <h4 class="text-info">Missing Values where columns have more than 5% missing values have been filled with the Most Frequent Category</h4>
-              </div>
-            </div>
-        {% endif %}
+{% if alert %}
+<hr />
+<div class="alert alert-success" role="alert">{{ alert }}</div>
+{% endif %}
 
-        {% if missings_percentage_after2 is not defined %}
-            <p>No missing values data available.</p>
-        {% elif is_missings_percentage_after2_string %}
-            <div class="alert alert-success">{{ missings_percentage_after2 }}</div>
-        {% else %}
-            <div class="card">
-              <div class="card-body">
-                  <h3>Percentage of Missing Values Left</h3>
-                  <pre>
-                      {% for column, percentage in missings_percentage_after2.items() %}
-                        {{ column }}: {{ percentage | round(2) }}%
-                      {% endfor %}
-                  </pre>
-              </div>
-            </div>
-        {% endif %}
-        
-        {% if df_describe_2 %}
-            <div class="card">
-              <div class="card-body">
-                  <h3>Summary Statistics</h3>
-                  <pre>
-                    {{ df_describe_2 | safe }}
-                  </pre>
-              </div>
-            </div>
-        {% endif %}
+<!-- Show the rest only if a dataset exists -->
+{% if session.get("dataset_id") %}
 
-        {% if missings_percentage_after2 %}
-          <form action="/clean_date_column" method="post" enctype="multipart/form-data">
-              <div class="mb-3">
-                <label for="date_col" class="form-label">Please, enter the name of the column containing dates:</label>
-                <input type="text" name="date_col" required class="form-control" id="date_col">
-              </div>
-              <button type="submit" class="btn btn-primary">Submit</button>
-          </form>
-            <hr>
-          <!-- download button -->
-          <h3 class="text-center mt-5">If your dataset has no date columns, your dataset cleaning finished. Download the cleaned dataset</h3>
-          <div class="text-center mt-5">
-              <a href="{{ url_for('download_cleaned_data') }}" class="btn btn-success">Download</a>
-          </div>
-        {% endif %}
+<!-- ===================== -->
+<!-- 2) Upload Results -->
+<!-- ===================== -->
+{% if df_info %}
+<div class="card mt-3">
+  <div class="card-body">
+    <h3>Dataset Info</h3>
+    <pre>
+{% for line in df_info %}{{ line }}
+{% endfor %}</pre
+    >
+  </div>
+</div>
+{% endif %} {% if df_duplicates %}
+<div class="card mt-3">
+  <div class="card-body">
+    <h3>Duplicate Rows</h3>
+    <pre>{{ df_duplicates }}</pre>
+  </div>
+</div>
+{% endif %} {% if df_duplicates_deleted %}
+<div class="card mt-3">
+  <div class="card-body">
+    <h3>Deleting Dataset Duplicates</h3>
+    <pre>{{ df_duplicates_deleted }}</pre>
+  </div>
+</div>
+{% endif %} {% if df_head %}
+<div class="card mt-3">
+  <div class="card-body">
+    <h3>First Five Rows of Dataset</h3>
+    <div class="table-responsive">{{ df_head | safe }}</div>
+  </div>
+</div>
+{% endif %} {% if df_describe %}
+<div class="card mt-3">
+  <div class="card-body">
+    <h3>Summary Statistics</h3>
+    <div class="table-responsive">{{ df_describe | safe }}</div>
+  </div>
+</div>
+{% endif %} {% if df_missings %}
+<div class="card">
+  <div class="card-body">
+    <h3>Missing Values</h3>
 
-        {% if replace_date_nan %}
-            <div class="card">
-              <div class="card-body">
-                <h4 class="text-info">The {{ date_col }} missing values replaced with a default date '2000-01-01'</h4>
-              </div>
-            </div>
-        {% endif %}
-
-        {% if df_describe_3 %}
-            <div class="card">
-              <div class="card-body">
-                  <h3>Summary Statistics</h3>
-                  <pre>
-                    {{ df_describe_3 | safe }}
-                  </pre>
-              </div>
-            </div>
-        {% endif %}
-
-        {% if categorical_columns %}
-            <div class="card">
-              <div class="card-body">
-                  <h4>Categorical Columns Names</h4>
-                  <pre>
-                      {% for col in categorical_columns %}
-                          <span><strong>{{ col }}:</strong> {{ categorical_values[col] }}</span>
-                      {% endfor %}
-                  </pre>
-                  <h6>*This version of the SmartClean app treats categorical values such as 'error' and 'unknown' the same as other categorical values. It does not delete records containing these values or replace them with the mode.</h6>
-              </div>
-            </div>
-        {% endif %}
-      
-        {% if df_describe_5 %}
-            <div class="card">
-              <div class="card-body">
-                  <h3>Summary Statistics</h3>
-                  <pre>
-                    {{ df_describe_5 | safe }}
-                  </pre>
-              </div>
-            </div>
-        {% endif %}
-
-        {% if df_info_2 %}
-            <div class="card">
-              <div class="card-body">
-                  <h3>Dataset Info</h3>
-                  <pre>
-                      {% for line in df_info_2 %}
-                        {{ line }}
-                      {% endfor %}
-                  </pre>
-              </div>
-            </div>
-        {% endif %}
-          
-        {% if df_head_5 %}
-            <div class="card">
-              <div class="card-body">
-                  <h3>First Five Rows of Dataset</h3>
-                  <pre>
-                    {{ df_head_5 | safe }}
-                  </pre>
-              </div>
-            </div>
-        {% endif %}
-            
-        {% if df_tail_5 %}
-            <div class="card">
-              <div class="card-body">
-                  <h3>Last Five Rows of Dataset</h3>
-                  <pre>
-                    {{ df_tail_5 | safe }}
-                  </pre>
-              </div>
-            </div>
-            <hr>
-            <!-- download button -->
-            <h3 class="text-center mt-5">The dataset is cleaned. Download the cleaned dataset</h3>
-            <div class="text-center mt-5">
-                <a href="{{ url_for('download_cleaned_data') }}" class="btn btn-success">Download</a>
-            </div>
-        {% endif %}
-
-
-
-
+    {% if df_missings is string %}
+    <p>{{ df_missings }}</p>
+    {% else %}
+    <pre>
+      {% for col, count in df_missings.items() %}
+        {{ col }}: {{ count }}
+      {% endfor %}
+      </pre
+    >
     {% endif %}
+  </div>
+</div>
+{% endif %}
 
+<hr class="my-4" />
 
-{% endblock %}
+<!-- ===================== -->
+<!-- 3) Numeric Cleaning -->
+<!-- ===================== -->
+<form method="post" action="/clean_numeric_columns">
+  <h4 id="numeric-clean">Numeric columns cleaning</h4>
+
+  {% if numeric_cols_list and numeric_cols_list|length > 0 %}
+  <p class="text-muted">
+    Available numeric-like columns:
+    <strong>{{ numeric_cols_list | join(', ') }}</strong>
+  </p>
+
+  <input
+    type="text"
+    class="form-control"
+    name="numeric_cols"
+    placeholder="e.g. {{ numeric_cols_list[:3] | join(', ') }}"
+    required
+  />
+
+  <p class="text-muted mt-2">
+    You can submit this form multiple times to clean different numeric columns
+    step by step.
+  </p>
+
+  <button type="submit" class="btn btn-primary mt-3">Submit</button>
+  {% else %}
+  <p class="text-muted">No numeric columns detected in this dataset.</p>
+  {% endif %}
+</form>
+
+{% if df_describe_4 %}
+<div class="card mt-3">
+  <div class="card-body">
+    <h3>Summary Statistics (after numeric conversion)</h3>
+    <div class="table-responsive">{{ df_describe_4 | safe }}</div>
+  </div>
+</div>
+{% endif %} {% if missings_percentage %}
+<div class="card mt-3">
+  <div class="card-body">
+    <h3>Percentage of Missing Values</h3>
+    <pre>
+{% for column, percentage in missings_percentage.items() %}{{ column }}: {{ percentage | round(2) }}%
+{% endfor %}</pre
+    >
+  </div>
+</div>
+{% endif %} {% if columns_less_5_perc_missing %}
+<div class="card mt-3">
+  <div class="card-body">
+    <h3>Columns with less than 5% missing values</h3>
+    <pre>
+{% for c in columns_less_5_perc_missing %}{{ c }}
+{% endfor %}</pre
+    >
+    <p class="text-info mt-2">
+      Records with missing values in those columns were dropped.
+    </p>
+  </div>
+</div>
+{% endif %} {% if missings_percentage_after %}
+<div class="card mt-3">
+  <div class="card-body">
+    <h3>Missing Values After Dropping</h3>
+    <pre>
+{% for column, percentage in missings_percentage_after.items() %}{{ column }}: {{ percentage | round(2) }}%
+{% endfor %}</pre
+    >
+  </div>
+</div>
+{% endif %} {% if fill_cat_mis_val %}
+<div class="card mt-3">
+  <div class="card-body">
+    <p class="text-info">
+      Remaining missing values were filled with the most frequent value (mode).
+    </p>
+  </div>
+</div>
+{% endif %} {% if df_describe_2 %}
+<div class="card mt-3">
+  <div class="card-body">
+    <h3>Summary Statistics (after missing values handling)</h3>
+    <div class="table-responsive">{{ df_describe_2 | safe }}</div>
+  </div>
+</div>
+{% endif %}
+
+<hr class="my-4" />
+
+<!-- ===================== -->
+<!-- 4) Date Cleaning -->
+<!-- ===================== -->
+<form action="/clean_date_column" method="post">
+  <h4 id="date-clean">Date column cleaning</h4>
+
+  {% if date_cols_list and date_cols_list|length > 0 %}
+  <p class="text-muted">
+    Detected date-like columns:
+    <strong>{{ date_cols_list | join(', ') }}</strong>
+  </p>
+
+  <input
+    type="text"
+    name="date_col"
+    class="form-control"
+    id="date_col"
+    placeholder="e.g. {{ date_cols_list[0] }}"
+    required
+  />
+
+  <button type="submit" class="btn btn-primary mt-3">Submit</button>
+  {% else %}
+  <p class="text-muted">No date columns detected in this dataset.</p>
+  {% endif %}
+</form>
+
+{% if replace_date_nan %}
+<div class="card mt-3">
+  <div class="card-body">
+    <p class="text-info">
+      Missing/invalid values in <strong>{{ date_col }}</strong> were replaced
+      with default date <code>2000-01-01</code>.
+    </p>
+  </div>
+</div>
+{% endif %} {% if df_describe_5 %}
+<div class="card mt-3">
+  <div class="card-body">
+    <h3>Summary Statistics (after categorical encoding)</h3>
+    <div class="table-responsive">{{ df_describe_5 | safe }}</div>
+  </div>
+</div>
+{% endif %} {% if df_info_2 %}
+<div class="card mt-3">
+  <div class="card-body">
+    <h3>Dataset Info (final)</h3>
+    <pre>
+{% for line in df_info_2 %}{{ line }}
+{% endfor %}</pre
+    >
+  </div>
+</div>
+{% endif %} {% if df_head_5 %}
+<div class="card mt-3">
+  <div class="card-body">
+    <h3>First Five Rows (final)</h3>
+    <div class="table-responsive">{{ df_head_5 | safe }}</div>
+  </div>
+</div>
+{% endif %} {% if df_tail_5 %}
+<div class="card mt-3">
+  <div class="card-body">
+    <h3>Last Five Rows (final)</h3>
+    <div class="table-responsive">{{ df_tail_5 | safe }}</div>
+  </div>
+</div>
+{% endif %}
+
+<hr class="my-4" />
+
+<!-- ===================== -->
+<!-- 5) Download (always visible when dataset exists) -->
+<!-- ===================== -->
+<h3 id="download" class="text-center mt-4">Download the cleaned dataset</h3>
+<div class="text-center mt-3">
+  <a href="{{ url_for('download_cleaned_data') }}" class="btn btn-success">
+    Download
+  </a>
+</div>
+
+{% endif %} {% endblock %}
