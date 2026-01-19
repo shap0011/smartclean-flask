@@ -16,6 +16,10 @@ from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 
+# In-memory store for demo purposes (resets on restart)
+DATA_STORE = {}
+MAX_STORE_ITEMS = 50
+
 app.secret_key = secrets.token_hex(16)
 app.permanent_session_lifetime = timedelta(minutes=30)
 
@@ -96,7 +100,20 @@ def clean():
                 df_duplicates_deleted = f"Dataset {duplicates_count} duplicated rows have been droppedDeletinf" 
             
             # store cleaned CSV in session (works across requests on Render)
-            session["cleaned_csv"] = df.to_csv(index=False)
+            csv_text = df.to_csv(index=False)
+
+            # Create an ID for this user's dataset
+            dataset_id = secrets.token_urlsafe(16)
+            session["dataset_id"] = dataset_id
+            session.permanent = True
+
+            # Store CSV server-side (not in cookie)
+            DATA_STORE[dataset_id] = csv_text
+
+            # Optional: basic cap so memory doesn't grow forever
+            if len(DATA_STORE) > MAX_STORE_ITEMS:
+                DATA_STORE.pop(next(iter(DATA_STORE)))
+
             session.permanent = True
 
 
@@ -136,10 +153,13 @@ def clean_numeric_columns():
     list_attr_to_numeric = [col.strip().lower() for col in numeric_cols_input.split(",")]
 
     # load the cleaned dataset
-    if "cleaned_csv" not in session:
+    dataset_id = session.get("dataset_id")
+    if not dataset_id or dataset_id not in DATA_STORE:
         return "Error: No dataset found. Please upload a file first.", 400
 
-    df = pd.read_csv(io.StringIO(session["cleaned_csv"]))
+    df = pd.read_csv(io.StringIO(DATA_STORE[dataset_id]))
+    DATA_STORE[dataset_id] = df.to_csv(index=False)
+
 
     # validate column names, keep only names which present in the dataset
     existing_numeric_cols = [re.sub(r"\s+", " ", col.strip().lower()) for col in list_attr_to_numeric if re.sub(r"\s+", " ", col.strip().lower()) in df.columns]
@@ -154,7 +174,20 @@ def clean_numeric_columns():
         df[col] = pd.to_numeric(df[col], errors="coerce")  # convert to numeric (invalid values -> NaN)
     
     # store cleaned CSV in session (works across requests on Render)
-    session["cleaned_csv"] = df.to_csv(index=False)
+    csv_text = df.to_csv(index=False)
+
+    # Create an ID for this user's dataset
+    dataset_id = secrets.token_urlsafe(16)
+    session["dataset_id"] = dataset_id
+    session.permanent = True
+
+    # Store CSV server-side (not in cookie)
+    DATA_STORE[dataset_id] = csv_text
+
+    # Optional: basic cap so memory doesn't grow forever
+    if len(DATA_STORE) > MAX_STORE_ITEMS:
+        DATA_STORE.pop(next(iter(DATA_STORE)))
+
     session.permanent = True
 
     # set flag to True
@@ -190,7 +223,20 @@ def clean_numeric_columns():
     df.fillna(df.mode().iloc[0], inplace=True)
     
     # store cleaned CSV in session (works across requests on Render)
-    session["cleaned_csv"] = df.to_csv(index=False)
+    csv_text = df.to_csv(index=False)
+
+    # Create an ID for this user's dataset
+    dataset_id = secrets.token_urlsafe(16)
+    session["dataset_id"] = dataset_id
+    session.permanent = True
+
+    # Store CSV server-side (not in cookie)
+    DATA_STORE[dataset_id] = csv_text
+
+    # Optional: basic cap so memory doesn't grow forever
+    if len(DATA_STORE) > MAX_STORE_ITEMS:
+        DATA_STORE.pop(next(iter(DATA_STORE)))
+
     session.permanent = True
 
     # set flag to True
@@ -246,10 +292,13 @@ def clean_date_column():
     date_col = request.form.get("date_col", "").strip()
 
     # load the cleaned dataset
-    if "cleaned_csv" not in session:
+    dataset_id = session.get("dataset_id")
+    if not dataset_id or dataset_id not in DATA_STORE:
         return "Error: No dataset found. Please upload a file first.", 400
 
-    df = pd.read_csv(io.StringIO(session["cleaned_csv"]))
+    df = pd.read_csv(io.StringIO(DATA_STORE[dataset_id]))
+    
+    DATA_STORE[dataset_id] = df.to_csv(index=False)
 
     # Check if the column exists in the dataset
     if date_col not in df.columns:
@@ -272,7 +321,20 @@ def clean_date_column():
     df[date_col] = df[date_col].fillna(pd.to_datetime('2000-01-01'))
     
     # store cleaned CSV in session (works across requests on Render)
-    session["cleaned_csv"] = df.to_csv(index=False)
+    csv_text = df.to_csv(index=False)
+
+    # Create an ID for this user's dataset
+    dataset_id = secrets.token_urlsafe(16)
+    session["dataset_id"] = dataset_id
+    session.permanent = True
+
+    # Store CSV server-side (not in cookie)
+    DATA_STORE[dataset_id] = csv_text
+
+    # Optional: basic cap so memory doesn't grow forever
+    if len(DATA_STORE) > MAX_STORE_ITEMS:
+        DATA_STORE.pop(next(iter(DATA_STORE)))
+
     session.permanent = True
 
     # set flag to True
@@ -302,7 +364,20 @@ def clean_date_column():
     df = pd.get_dummies(df, columns=categorical_columns)
     
     # store cleaned CSV in session (works across requests on Render)
-    session["cleaned_csv"] = df.to_csv(index=False)
+    csv_text = df.to_csv(index=False)
+
+    # Create an ID for this user's dataset
+    dataset_id = secrets.token_urlsafe(16)
+    session["dataset_id"] = dataset_id
+    session.permanent = True
+
+    # Store CSV server-side (not in cookie)
+    DATA_STORE[dataset_id] = csv_text
+
+    # Optional: basic cap so memory doesn't grow forever
+    if len(DATA_STORE) > MAX_STORE_ITEMS:
+        DATA_STORE.pop(next(iter(DATA_STORE)))
+
     session.permanent = True
 
     # summary statistics
@@ -333,11 +408,12 @@ def clean_date_column():
 
 @app.route('/download_cleaned_data')
 def download_cleaned_data():
-    if "cleaned_csv" not in session:
+    dataset_id = session.get("dataset_id")
+    if not dataset_id or dataset_id not in DATA_STORE:
         return "Error: No cleaned dataset found.", 400
 
     return send_file(
-        io.BytesIO(session["cleaned_csv"].encode("utf-8")),
+        io.BytesIO(DATA_STORE[dataset_id].encode("utf-8")),
         mimetype="text/csv",
         as_attachment=True,
         download_name="cleaned_data.csv"
