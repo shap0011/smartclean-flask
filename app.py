@@ -363,6 +363,12 @@ def clean_date_column():
     # convert categorical data into numerical formats
     df = pd.get_dummies(df, columns=categorical_columns)
     
+    # Convert True/False to 1/0
+    bool_cols = df.select_dtypes(include="bool").columns
+    df[bool_cols] = df[bool_cols].astype(int)
+    
+    df = df.replace({"true": 1, "false": 0, True: 1, False: 0})
+    
     # store cleaned CSV in session (works across requests on Render)
     csv_text = df.to_csv(index=False)
 
