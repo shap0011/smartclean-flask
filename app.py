@@ -1,3 +1,7 @@
+from flask import session
+from datetime import timedelta
+import secrets
+
 from flask import Flask, request, render_template, send_file
 
 import pandas as pd
@@ -8,7 +12,12 @@ import re
 import os
 import io
 
+from werkzeug.utils import secure_filename
+
 app = Flask(__name__)
+
+app.secret_key = secrets.token_hex(16)
+app.permanent_session_lifetime = timedelta(minutes=30)
 
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -38,17 +47,14 @@ def clean():
         if not file:
             alert = "No file selected"
         else:
-            filepath = os.path.join(UPLOAD_FOLDER, file.filename)
+            filename = secure_filename(file.filename)
+            filepath = os.path.join(UPLOAD_FOLDER, filename)
+
             file.save(filepath)
 
-            df = pd.read_csv(filepath)
-
-            # define cleaned_filepath
-            cleaned_filepath = os.path.join(UPLOAD_FOLDER, "cleaned_data.csv")
-        
+            df = pd.read_csv(filepath)        
             
             alert = f"File {file.filename} uploaded successfully! Loaded {df.shape[0]} rows"
-
             
             # standardize dataset column names (strip spaces, lowercase, remove extra spaces inside names)
             df.columns = df.columns.str.strip().str.lower().str.replace(r"\s+", " ", regex=True)
@@ -88,9 +94,11 @@ def clean():
             else:
                 df.drop_duplicates(inplace=True)
                 df_duplicates_deleted = f"Dataset {duplicates_count} duplicated rows have been droppedDeletinf" 
+            
+            # store cleaned CSV in session (works across requests on Render)
+            session["cleaned_csv"] = df.to_csv(index=False)
+            session.permanent = True
 
-            # save the cleaned dataset
-            df.to_csv(cleaned_filepath, index=False)
 
 
     return render_template(
@@ -128,12 +136,10 @@ def clean_numeric_columns():
     list_attr_to_numeric = [col.strip().lower() for col in numeric_cols_input.split(",")]
 
     # load the cleaned dataset
-    cleaned_filepath = os.path.join(UPLOAD_FOLDER, "cleaned_data.csv")
-
-    if not os.path.exists(cleaned_filepath):
+    if "cleaned_csv" not in session:
         return "Error: No dataset found. Please upload a file first.", 400
 
-    df = pd.read_csv(cleaned_filepath)
+    df = pd.read_csv(io.StringIO(session["cleaned_csv"]))
 
     # validate column names, keep only names which present in the dataset
     existing_numeric_cols = [re.sub(r"\s+", " ", col.strip().lower()) for col in list_attr_to_numeric if re.sub(r"\s+", " ", col.strip().lower()) in df.columns]
@@ -146,9 +152,10 @@ def clean_numeric_columns():
     for col in existing_numeric_cols:
         df[col] = df[col].astype(str).str.replace(r"[^\d.]", "", regex=True)  # keep only numbers & decimal points
         df[col] = pd.to_numeric(df[col], errors="coerce")  # convert to numeric (invalid values -> NaN)
-
-    # save the cleaned dataset
-    df.to_csv(cleaned_filepath, index=False)
+    
+    # store cleaned CSV in session (works across requests on Render)
+    session["cleaned_csv"] = df.to_csv(index=False)
+    session.permanent = True
 
     # set flag to True
     replace_numeric_nan = True
@@ -181,9 +188,10 @@ def clean_numeric_columns():
 
     # fill categorical missing values with the most frequent category
     df.fillna(df.mode().iloc[0], inplace=True)
-
-    # save/update the 'cleaned_data.csv' dataset ()
-    df.to_csv(cleaned_filepath, index=False)
+    
+    # store cleaned CSV in session (works across requests on Render)
+    session["cleaned_csv"] = df.to_csv(index=False)
+    session.permanent = True
 
     # set flag to True
     fill_cat_mis_val = True
@@ -238,14 +246,10 @@ def clean_date_column():
     date_col = request.form.get("date_col", "").strip()
 
     # load the cleaned dataset
-    cleaned_filepath = os.path.join(UPLOAD_FOLDER, "cleaned_data.csv")
-
-    # if no file uploaded
-    if not os.path.exists(cleaned_filepath):
+    if "cleaned_csv" not in session:
         return "Error: No dataset found. Please upload a file first.", 400
 
-    # save the data in 'cleaned_data.csv'
-    df = pd.read_csv(cleaned_filepath)
+    df = pd.read_csv(io.StringIO(session["cleaned_csv"]))
 
     # Check if the column exists in the dataset
     if date_col not in df.columns:
@@ -266,9 +270,10 @@ def clean_date_column():
 
     # replace NaN with a default date '2000-01-01'
     df[date_col] = df[date_col].fillna(pd.to_datetime('2000-01-01'))
-
-    # save cleaned dataset
-    df.to_csv(cleaned_filepath, index=False)
+    
+    # store cleaned CSV in session (works across requests on Render)
+    session["cleaned_csv"] = df.to_csv(index=False)
+    session.permanent = True
 
     # set flag to True
     replace_date_nan = True
@@ -296,8 +301,9 @@ def clean_date_column():
     # convert categorical data into numerical formats
     df = pd.get_dummies(df, columns=categorical_columns)
     
-    # save cleaned dataset
-    df.to_csv(cleaned_filepath, index=False)
+    # store cleaned CSV in session (works across requests on Render)
+    session["cleaned_csv"] = df.to_csv(index=False)
+    session.permanent = True
 
     # summary statistics
     df_describe_5 = df.describe(include="all").to_html(classes="table table-striped", escape=False)
@@ -327,12 +333,15 @@ def clean_date_column():
 
 @app.route('/download_cleaned_data')
 def download_cleaned_data():
-    cleaned_filepath = os.path.join(UPLOAD_FOLDER, "cleaned_data.csv")
-
-    if not os.path.exists(cleaned_filepath):
+    if "cleaned_csv" not in session:
         return "Error: No cleaned dataset found.", 400
 
-    return send_file(cleaned_filepath, as_attachment=True, download_name="cleaned_data.csv")
+    return send_file(
+        io.BytesIO(session["cleaned_csv"].encode("utf-8")),
+        mimetype="text/csv",
+        as_attachment=True,
+        download_name="cleaned_data.csv"
+    )
 
 @app.route('/contact')
 def contact():
