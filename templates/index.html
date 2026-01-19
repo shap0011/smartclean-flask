@@ -1,11 +1,31 @@
-{% extends "base.html" %}
-{% block title %}Home Page{% endblock %}
-{% block header1 %}Home{% endblock %}
-{% block content %}
-    <div>
-        <img src="{{ url_for('static', filename='image1.jpg') }}" class="img-fluid" alt="Office Work" width="400" height="266">
-        <p class="smartclean text-info">SmartClean</p>
-        <p class="fs-2 text-end">Accelerate Your Data Cleaning</p>    
-    </div>
-{% endblock %}
+{% extends "base.html" %} {% block title %}Home Page{% endblock %} {% block
+header1 %}Home{% endblock %} {% block content %}
 
+<div class="row align-items-center g-4">
+  <div class="col-12 col-lg-6">
+    <img
+      src="{{ url_for('static', filename='image1.jpg') }}"
+      class="img-fluid rounded-4 shadow-sm"
+      alt="Office Work"
+    />
+  </div>
+
+  <div class="col-12 col-lg-6 text-center text-lg-start">
+    <p class="smartclean text-info mb-2">SmartClean</p>
+    <p class="fs-4 fs-lg-2 mb-3">Accelerate Your Data Cleaning</p>
+    <div class="d-flex flex-column flex-sm-row gap-2">
+      <a class="btn btn-primary" href="{{ url_for('clean') }}"
+        >Start Cleaning</a
+      >
+      <a class="btn btn-outline-secondary" href="{{ url_for('about') }}"
+        >Learn More</a
+      >
+    </div>
+    <p class="text-muted mt-3 mb-0">
+      Upload a CSV, clean numeric + date columns, handle missing values, and
+      download the result.
+    </p>
+  </div>
+</div>
+
+{% endblock %}
