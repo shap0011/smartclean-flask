@@ -1,74 +1,92 @@
-{% extends "base.html" %} {% block title %}Contact{% endblock %} {% block
+{% extends "base.html" %} {% block title %}Contact Page{% endblock %} {% block
 header1 %}Contact{% endblock %} {% block content %}
-
 <section class="py-4">
-  <div class="row g-4">
-    <!-- Profile Card -->
-    <div class="col-12 col-lg-5">
-      <div class="card border-0 shadow-sm rounded-4 h-100">
-        <div class="card-body p-4 text-center">
+  <div class="row g-4 align-items-stretch">
+    <!-- Profile card -->
+    <div class="col-12 col-lg-4">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body text-center">
           <img
             src="{{ url_for('static', filename='olga.jpeg') }}"
-            class="rounded-circle shadow-sm mb-3"
+            class="img-fluid rounded-circle mb-3"
             alt="Olga Durham"
             style="width: 140px; height: 140px; object-fit: cover"
           />
-          <h3 class="fw-bold mb-1">Olga Durham</h3>
+          <h3 class="h5 mb-1">Olga Durham</h3>
           <p class="text-muted mb-0">SmartClean Developer</p>
-
-          <hr class="my-4" />
-
-          <div class="d-grid gap-2">
-            <a class="btn btn-primary" href="mailto:{{ email }}"> Email Me </a>
-          </div>
         </div>
       </div>
     </div>
 
-    <!-- Contact Info -->
-    <div class="col-12 col-lg-7">
-      <div class="card border-0 shadow-sm rounded-4 h-100">
-        <div class="card-body p-4 p-lg-5">
-          <h4 class="fw-bold mb-3">Get in touch</h4>
-          <p class="text-muted mb-4">
-            Questions, feedback, or suggestions? Send a message anytime.
-          </p>
+    <!-- Contact actions -->
+    <div class="col-12 col-lg-8">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body">
+          <h2 class="h4 mb-3">Get in touch</h2>
 
-          <div class="row g-3">
-            <div class="col-12">
-              <div class="p-3 rounded-3 bg-body-tertiary">
-                <div class="text-muted small">Email</div>
-                <div class="fw-semibold">
-                  <a class="text-decoration-none" href="mailto:{{ email }}"
-                    >{{ email }}</a
-                  >
-                </div>
-              </div>
+          <div class="mb-3">
+            <div class="text-muted small">Email</div>
+            <div class="d-flex flex-wrap gap-2 align-items-center">
+              <code class="px-2 py-1 bg-body-tertiary rounded"
+                >{{ email }}</code
+              >
+
+              <a class="btn btn-primary" href="mailto:{{ email }}">
+                Email me
+              </a>
+
+              <button
+                class="btn btn-outline-secondary"
+                type="button"
+                onclick="navigator.clipboard.writeText('{{ email }}')"
+              >
+                Copy email
+              </button>
             </div>
-
-            <div class="col-12">
-              <div class="p-3 rounded-3 bg-body-tertiary">
-                <div class="text-muted small">Phone</div>
-                <div class="fw-semibold">
-                  <a
-                    class="text-decoration-none"
-                    href="tel:{{ tel | replace(' ', '') }}"
-                    >{{ tel }}</a
-                  >
-                </div>
-              </div>
+            <div class="form-text">
+              If “Email me” doesn’t open, your computer may not have a default
+              mail app set — “Copy email” always works.
             </div>
           </div>
 
-          <div class="mt-4">
-            <a class="btn btn-outline-secondary" href="{{ url_for('about') }}"
-              >Learn about SmartClean</a
+          <div class="mb-3">
+            <div class="text-muted small">Phone</div>
+            <div class="d-flex flex-wrap gap-2 align-items-center">
+              <code class="px-2 py-1 bg-body-tertiary rounded">{{ tel }}</code>
+              <a
+                class="btn btn-outline-primary"
+                href="tel:{{ tel|replace(' ', '')|replace('-', '') }}"
+              >
+                Call
+              </a>
+            </div>
+          </div>
+
+          <hr />
+
+          <!-- Optional: add your links later -->
+          <div class="d-flex flex-wrap gap-2">
+            <!-- Replace # with your real links when ready -->
+            <a
+              class="btn btn-outline-dark"
+              href="https://github.com/shap0011"
+              target="_blank"
+              rel="noopener"
             >
+              GitHub
+            </a>
+            <a
+              class="btn btn-outline-primary"
+              href="https://www.linkedin.com/in/olga-durham/"
+              target="_blank"
+              rel="noopener"
+            >
+              LinkedIn
+            </a>
           </div>
         </div>
       </div>
     </div>
   </div>
 </section>
-
 {% endblock %}
