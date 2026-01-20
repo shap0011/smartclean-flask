@@ -1,66 +1,69 @@
 {% extends "base.html" %} {% block title %}Contact{% endblock %} {% block
 header1 %}Contact{% endblock %} {% block content %}
-<section class="py-5">
-  <div class="container">
-    <div class="row g-4 align-items-stretch">
-      <!-- Profile card -->
-      <div class="col-12 col-lg-4">
-        <div class="card h-100 shadow-sm border-0">
-          <div class="card-body text-center p-4">
-            <img
-              src="{{ url_for('static', filename='olga.jpeg') }}"
-              class="rounded-circle shadow-sm mb-3"
-              alt="Olga Durham"
-              width="200"
-              height="200"
-              style="object-fit: cover"
-            />
-            <h5 class="fw-bold mb-1">Olga Durham</h5>
-            <p class="text-muted mb-0">SmartClean Developer</p>
+
+<section class="py-4">
+  <div class="row g-4">
+    <!-- Profile Card -->
+    <div class="col-12 col-lg-5">
+      <div class="card border-0 shadow-sm rounded-4 h-100">
+        <div class="card-body p-4 text-center">
+          <img
+            src="{{ url_for('static', filename='olga.jpeg') }}"
+            class="rounded-circle shadow-sm mb-3"
+            alt="Olga Durham"
+            style="width: 140px; height: 140px; object-fit: cover"
+          />
+          <h3 class="fw-bold mb-1">Olga Durham</h3>
+          <p class="text-muted mb-0">SmartClean Developer</p>
+
+          <hr class="my-4" />
+
+          <div class="d-grid gap-2">
+            <a class="btn btn-primary" href="mailto:{{ email }}"> Email Me </a>
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- Contact details card -->
-      <div class="col-12 col-lg-8">
-        <div class="card h-100 shadow-sm border-0">
-          <div class="card-body p-4 p-lg-5">
-            <h2 class="fw-bold text-info mb-3">Get in touch</h2>
-            <p class="text-muted mb-4">
-              Questions, feedback, or feature ideas? Reach out anytime.
-            </p>
+    <!-- Contact Info -->
+    <div class="col-12 col-lg-7">
+      <div class="card border-0 shadow-sm rounded-4 h-100">
+        <div class="card-body p-4 p-lg-5">
+          <h4 class="fw-bold mb-3">Get in touch</h4>
+          <p class="text-muted mb-4">
+            Questions, feedback, or suggestions? Send a message anytime.
+          </p>
 
-            <div class="row g-3">
-              <div class="col-12 col-md-6">
-                <div class="p-3 rounded-4 bg-light">
-                  <div class="fw-semibold mb-1">Email</div>
-                  <a class="text-decoration-none" href="mailto:{{ email }}">
-                    {{ email }}
-                  </a>
-                </div>
-              </div>
-
-              <div class="col-12 col-md-6">
-                <div class="p-3 rounded-4 bg-light">
-                  <div class="fw-semibold mb-1">Cell</div>
-                  <a class="text-decoration-none" href="tel:{{ tel }}">
-                    {{ tel }}
-                  </a>
+          <div class="row g-3">
+            <div class="col-12">
+              <div class="p-3 rounded-3 bg-body-tertiary">
+                <div class="text-muted small">Email</div>
+                <div class="fw-semibold">
+                  <a class="text-decoration-none" href="mailto:{{ email }}"
+                    >{{ email }}</a
+                  >
                 </div>
               </div>
             </div>
 
-            <hr class="my-4" />
-
-            <div class="d-flex flex-wrap gap-2">
-              <a class="btn btn-primary" href="mailto:{{ email }}">Email me</a>
-              <a
-                class="btn btn-outline-secondary"
-                href="{{ url_for('clean') }}"
-              >
-                Try SmartClean
-              </a>
+            <div class="col-12">
+              <div class="p-3 rounded-3 bg-body-tertiary">
+                <div class="text-muted small">Phone</div>
+                <div class="fw-semibold">
+                  <a
+                    class="text-decoration-none"
+                    href="tel:{{ tel | replace(' ', '') }}"
+                    >{{ tel }}</a
+                  >
+                </div>
+              </div>
             </div>
+          </div>
+
+          <div class="mt-4">
+            <a class="btn btn-outline-secondary" href="{{ url_for('about') }}"
+              >Learn about SmartClean</a
+            >
           </div>
         </div>
       </div>
@@ -68,10 +71,4 @@ header1 %}Contact{% endblock %} {% block content %}
   </div>
 </section>
 
-<!-- Slogan (matches the About page style) -->
-<section class="py-4 bg-light">
-  <div class="container text-end">
-    <p class="fs-3 fw-semibold mb-0">Accelerate Your Data Cleaning</p>
-  </div>
-</section>
 {% endblock %}

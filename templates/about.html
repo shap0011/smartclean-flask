@@ -1,52 +1,72 @@
 {% extends "base.html" %} {% block title %}About{% endblock %} {% block header1
 %}About{% endblock %} {% block content %}
-<section class="py-5">
-  <div class="container">
-    <div class="row align-items-center g-5">
-      <!-- Image -->
-      <div class="col-12 col-lg-6 text-center">
+
+<section class="py-4">
+  <div class="row align-items-center g-4">
+    <!-- Image -->
+    <div class="col-12 col-lg-6">
+      <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
         <img
           src="{{ url_for('static', filename='image2.jpg') }}"
-          class="img-fluid rounded-4 shadow"
-          alt="Data visualization"
+          class="img-fluid"
+          alt="Data cleaning illustration"
         />
       </div>
+    </div>
 
-      <!-- Text -->
-      <div class="col-12 col-lg-6">
-        <h2 class="fw-bold mb-3 text-info">
-          SmartClean: Efficient Dataset Cleaning Made Easy
-        </h2>
+    <!-- Text -->
+    <div class="col-12 col-lg-6">
+      <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-4 p-lg-5">
+          <h2 class="fw-bold mb-3">SmartClean</h2>
+          <p class="text-muted mb-4">
+            SmartClean helps you upload a CSV, clean messy values, and download
+            a ready-to-use dataset — faster and with fewer steps.
+          </p>
 
-        <p class="lead">
-          SmartClean 1.0.0 is a powerful web application designed to streamline
-          and accelerate dataset cleaning.
-        </p>
+          <h5 class="fw-semibold mb-3">What SmartClean supports</h5>
+          <div class="row g-3">
+            <div class="col-12">
+              <div class="p-3 rounded-3 bg-body-tertiary">
+                <div class="fw-semibold">Numeric datasets</div>
+                <div class="text-muted small">
+                  Convert invalid values → NaN and handle missing data.
+                </div>
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="p-3 rounded-3 bg-body-tertiary">
+                <div class="fw-semibold">Numeric + categorical datasets</div>
+                <div class="text-muted small">
+                  Clean numeric columns and prepare categories for analysis.
+                </div>
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="p-3 rounded-3 bg-body-tertiary">
+                <div class="fw-semibold">Datasets with date columns</div>
+                <div class="text-muted small">
+                  Detect and clean date columns (invalid → default date).
+                </div>
+              </div>
+            </div>
+          </div>
 
-        <p>It supports the following types of datasets:</p>
+          <div class="mt-4 d-flex flex-wrap gap-2">
+            <a class="btn btn-primary" href="{{ url_for('clean') }}"
+              >Start Cleaning</a
+            >
+            <a class="btn btn-outline-secondary" href="{{ url_for('contact') }}"
+              >Contact</a
+            >
+          </div>
 
-        <ol class="mb-4">
-          <li>Datasets containing only numerical values</li>
-          <li>Datasets with both numerical and categorical variables</li>
-          <li>
-            Datasets that include numerical, categorical, and date columns
-          </li>
-        </ol>
-
-        <p>
-          With SmartClean, users can effortlessly upload a dataset, apply
-          automated cleaning processes, and download a refined version —
-          ensuring cleaner, more reliable data in just a few clicks.
-        </p>
+          <p class="mt-4 mb-0 text-muted small">
+            Version: <span class="fw-semibold">SmartClean 1.0.0</span>
+          </p>
+        </div>
       </div>
     </div>
-  </div>
-</section>
-
-<!-- Slogan -->
-<section class="py-4 bg-dark text-light">
-  <div class="container text-center">
-    <p class="fs-3 fw-semibold mb-0">Accelerate Your Data Cleaning</p>
   </div>
 </section>
 

@@ -46,7 +46,9 @@
   <!-- FLEX COLUMN LAYOUT -->
   <body class="d-flex flex-column min-vh-100">
     <!-- NAVBAR -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav
+      class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom border-dark-subtle"
+    >
       <div class="container">
         <a
           class="navbar-brand d-flex align-items-center gap-2 fw-semibold"
@@ -60,11 +62,11 @@
             class="d-inline-block"
             style="object-fit: contain"
           />
-          <span>SmartClean</span>
+          <span class="text-white">SmartClean</span>
         </a>
 
         <button
-          class="navbar-toggler"
+          class="navbar-toggler border-0"
           type="button"
           data-bs-toggle="collapse"
           data-bs-target="#navMain"
@@ -76,34 +78,40 @@
         </button>
 
         <div class="collapse navbar-collapse" id="navMain">
-          <ul class="navbar-nav ms-auto text-center">
+          <ul
+            class="navbar-nav ms-auto align-items-lg-center gap-lg-2 text-center mt-3 mt-lg-0"
+          >
             <li class="nav-item">
               <a
-                class="nav-link {% if request.endpoint == 'home' %}active{% endif %}"
+                class="nav-link {% if request.endpoint == 'home' %}active fw-semibold{% endif %}"
                 href="{{ url_for('home') }}"
-                >Home</a
               >
+                Home
+              </a>
             </li>
             <li class="nav-item">
               <a
-                class="nav-link {% if request.endpoint == 'about' %}active{% endif %}"
+                class="nav-link {% if request.endpoint == 'about' %}active fw-semibold{% endif %}"
                 href="{{ url_for('about') }}"
-                >About</a
               >
+                About
+              </a>
             </li>
             <li class="nav-item">
               <a
-                class="nav-link {% if request.endpoint == 'clean' %}active{% endif %}"
+                class="nav-link {% if request.endpoint == 'clean' %}active fw-semibold{% endif %}"
                 href="{{ url_for('clean') }}"
-                >Clean</a
               >
+                Clean
+              </a>
             </li>
             <li class="nav-item">
               <a
-                class="nav-link {% if request.endpoint == 'contact' %}active{% endif %}"
+                class="nav-link {% if request.endpoint == 'contact' %}active fw-semibold{% endif %}"
                 href="{{ url_for('contact') }}"
-                >Contact</a
               >
+                Contact
+              </a>
             </li>
           </ul>
         </div>
