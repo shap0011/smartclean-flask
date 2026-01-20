@@ -54,6 +54,7 @@ It allows users to upload CSV files, clean numerical, categorical, and date data
 
 ## 📂 Project Structure
 
+```
 smartclean-flask/
 │
 ├── app.py
@@ -75,6 +76,7 @@ smartclean-flask/
 │ └── bootstrap/
 │
 └── uploads/
+```
 
 
 ---
