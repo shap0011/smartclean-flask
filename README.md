@@ -126,7 +126,7 @@ The application is deployed on Render and runs successfully in production:
 👩‍💻 Author
 
 Olga Durham
-Final Project – Web Development IV
+Final Project – Business Intelligence Programming (Python) Advanced Concepts
 Algonquin College
 
 📧 shap0011@algonquinlive.com
